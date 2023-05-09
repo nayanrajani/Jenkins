@@ -126,10 +126,77 @@
       - sudo chown 1000:1000 -R ~/jenkins-data.
       - docker-compose up -d
 
-  - To add a DNS name against IP:8080 (but still you need to add :8080)
+  - To add a DNS name against IP:8080 (but still you need to add :8080, if machine shutdown then you need to do it again)
     - open notepad as a administrator
     - file -> open
     - got to this path -> C:\Windows\System32\drivers\etc
     - select all files and then select hosts file -> open
     - ad ip only and add a space and DNS
       ex: 192.168.0.0 jenkins.local
+  
+  - To run a service under the container
+    - we can run below command
+      - docker exec -it jenkins sh
+      - java --version
+
+## Getting Started with Jenkins
+
+### Intro to Jenkins UI
+
+- power up system and jenkins again
+  - cd jenkins-data
+  - docker-compose up -d
+
+- Hands On! Create first Jenkins Job [A Task in Jenkins called a Job]
+  - create new item
+  - give name "my-first-job"
+  - free-style projects
+    - Build Environment
+      - in the add build build setup section select  "Execute shell"
+        - Echo Hello World!
+      - Save
+    - Click build now
+    - go to build history and chek your console output
+
+- Let's play with our first job
+  - again go to configure and under build step section, print date with string
+    - echo "current date is $(date)"   //whoami, 
+    - repeat the steps for save and build and console output
+
+- redirect output of first job 
+  - again in shell,
+    - NAME=Nayan
+    - echo "Hello $NAME. The current date and Time is $(date)"
+
+  - to redirect in a file
+    - NAME=Nayan
+    - echo "Hello $NAME. The current date and Time is $(date)" > /temp/info
+    - cat /temp/info
+
+- Learn how to execute a bash script from Jenkins
+  - let's create a script in VM machine outside of service container ($1 and $2 are parameters we will provide)
+    - vi script.sh
+      #!/bin/bash
+      Name=$1
+      LastName=$2
+
+      echo "Hello! $Name $LastName"
+
+    - esc, :wq! , enter
+    - chmod +x ./script.sh
+    - ./script.sh Nayan Rajani
+  
+  - COpy the file in jenkins container
+    - docker cp script.sh jenkins:/tmp/script.sh
+    - docker exec -it jenkins sh
+    - cat /tmp/script.sh
+      - /tmp/script.sh Nayan Rajani (Execute this in first job as well)
+
+      OR
+
+      - Name=Nayan
+      - LastName=Rajani
+      - /tmp/script.sh $Name $LastName
+
+- Add Parameters to your Job
+  - 
