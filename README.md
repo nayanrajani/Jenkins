@@ -1,6 +1,16 @@
 # Jenkins- Beginners to Advance
 
 - ctrl + r (FOR Command SEARCH)
+- change date
+  - sudo su -
+  - password
+  - sudo date -s "2023-05-12 12:36:45"  //change accordingly
+
+  OR
+
+  - cd /usr/share/zoneinfo
+  - tzselect
+    - enter details accordingly
 
 ## Section-2 Introduction & Installation
 
