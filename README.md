@@ -51,7 +51,7 @@
     - sudo -i, then add password
     - yum update -y
       - if yum gets stuck "Another app is currently holding the yum lock; waiting for it to exit..."
-      - check https://www.golinuxcloud.com/another-app-is-currently-holding-the-yum-lock/
+      - check <https://www.golinuxcloud.com/another-app-is-currently-holding-the-yum-lock/>
     - vi /etc/yum.conf
       - press insert from keyboard and add below configuration incide that file after this line "distroverpkg=centos-release"
         - #add timeout here
@@ -61,7 +61,7 @@
   - Copy and paste the commands from link to VM.
   - Install using the rpm repository
     - sudo yum install -y yum-utils
-    - sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    - sudo yum-config-manager --add-repo <https://download.docker.com/linux/centos/docker-ce.repo>
   - Install Docker Engine
     - sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - y
@@ -77,7 +77,7 @@
       - login again
         - docker ps
   - Install Docker Compose
-    - sudo curl -SL https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+    - sudo curl -SL <https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64> -o /usr/local/bin/docker-compose
       - add password
     - sudo chmod +x /usr/local/bin/docker-compose    // executable permissions
     - docker-compose
