@@ -1,6 +1,6 @@
-## Section-2 Introduction & Installation
+# Section-2 Introduction & Installation
 
-### [Jenkins](https://www.jenkins.io/)
+## [Jenkins](https://www.jenkins.io/)
 
 - Jenkins is a self-contained, open source automation server which can be used to automate all sorts of tasks related to building, testing, and delivering or deploying software.
 
@@ -40,11 +40,11 @@
         - #add timeout here
         - timeout=120
       - esc, :wq!, this will save the file
-    - exit 
+    - exit
   - Copy and paste the commands from link to VM.
   - Install using the rpm repository
     - sudo yum install -y yum-utils
-    - sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    - sudo yum-config-manager --add-repo <https://download.docker.com/linux/centos/docker-ce.repo>
   - Install Docker Engine
     - sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
       - y
@@ -60,7 +60,7 @@
       - login again
         - docker ps
   - Install Docker Compose
-    - sudo curl -SL https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+    - sudo curl -SL <https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-linux-x86_64> -o /usr/local/bin/docker-compose
       - add password
     - sudo chmod +x /usr/local/bin/docker-compose    // executable permissions
     - docker-compose
@@ -99,7 +99,7 @@
     - docker logs -f [name]  //show logs for acertain containers OR it will provide the Admin Password for Jenkins
     - Access jenkins on web ->  [VM-Ip]:8080
     - Copy and paste the password
-      - Continue 
+      - Continue
       - click on install suggested plugins  // it will take a while
     - now create a Admin user and password carefully
       - save and continue
