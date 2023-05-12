@@ -1,6 +1,6 @@
 # Section-5-Jenkins&AWS
 
-### MYSQL + AWS + SHELL SCRIPTING + JENKINS
+## MYSQL + AWS + SHELL SCRIPTING + JENKINS
 
 - We are going to create a jenkins job that gonna take a mysql backup and it will be uploaded to s3.
 
@@ -122,9 +122,9 @@
 
 - create access key and secret key again if you have deleted.
 - docker exec -ti remote-host bash
-- to upload to s3-code check aws-s3.sh
-  - copy and paste the content of that file
 - vi /tmp/aws-s3.sh
+  - to upload to s3-code check aws-s3.sh
+  - copy and paste the content of that file
   - save it
 - aws configure
   - AWS_ACCESS_KEY_ID= <your_Access_key>
@@ -132,3 +132,113 @@
   - region=ap-south-1
   - Hit Enter
 - /tmp/aws-s3.sh db_host 123456 testdb jenkins-mysql-backup-training
+
+### Learn how to manage sensitive information in Jenkins (Keys, Passwords)
+
+- Create two credntials [choose secret text] for AWS_SECRET_KEY and MYSQL_PASSWORD
+  - ID - AWS_SECRET_KEY
+  - Secret - <your_Secret_key>
+  - ID - MYSQL_PASSWORD
+  - Secret - <db_password>
+
+### Create a Jenkins job to upload your DB to AWS
+
+- in jenkins
+  - new item
+  - backup-to-aws
+  - free-style-project
+  - ok
+
+- go to general section
+  - this project is parameterized
+  - string parameter
+    - name: MYSQL_HOST
+    - default value: db_host
+  - string parameter
+    - name: DATABASE_NAME
+    - default value: testdb
+  - string parameter
+    - name: AWS_BUCKET_NAME
+    - default value: jenkins-mysql-backup-training
+
+- go to build enviornment section
+  - select use secret text
+  - add
+    - secret text
+      - variable: MYSQL_PASSWORD
+      - credential: select mysql_secret
+  - add
+    - secret text
+      - variable: AWS_SECRET_KEY
+      - credential: select aws_secret
+
+- For this execution on remote host by jenkins we need to create a new file check aws-s3-v1.sh
+  - vi /tmp/aws-s3-v1.sh
+    - to upload to s3-code check aws-s3-v1.sh
+    - copy and paste the content of that file
+    - save it
+  - chmod +x /tmp/aws-s3-v1.sh
+
+- go to Build Section
+- jenkins again
+  - add build step
+    - execute shell script on remote host using ssh
+      - ssh_site: slect remote-host
+      - command: /tmp/aws-s3-v1.sh $MYSQL_HOST $MYSQL_PASSWORD $DATABASE_NAME $AWS_SECRET_KEY $AWS_BUCKET_NAME
+
+- save
+- build with parameter
+- check console output
+
+### Persist the script on the remote host
+
+- docker ps -a
+- let's say bychance you deleted the container by below command
+  - docker kill [name-of-container] //Do not run this command
+
+- and if you recreate at same level
+  - docker-compose up -d
+  - docker exec -ti remote-host bash
+  - cat /tmp/aws-s3.sh
+  - You will get nothing, files are deleted because of container deletion
+  - exit
+
+- NOW we are going to mount this files parmanently to the volumes.
+- ll
+
+- Modify the docker-compose.yml
+  - check docker-compose1.yml //do not recreate, i have created for simplicity
+  - just adding volumes will be fine in your original file in your VM.
+  - save
+
+- docker-compose up -d
+- docker exec -ti remote-host bash
+- /tmp/aws-s3.sh db_host 123456 testdb jenkins-mysql-backup-training
+- run from jenkins as well.
+
+### Reuse your Job to upload different DB's to different buckets
+
+- now create a new database inside remote-host
+- docker exec -ti remote-host bash
+  - mysql -u root -h db_host -p
+    - Enter Password: 123456
+  - now you are under the mysql server host
+  - now create a database, run these below cmmand
+
+    - create database test2;
+    - use test2;
+      - create table info (name varchar(20), lastname varchar(20), age int(2));
+      - desc info;
+      - insert into info values('Nayan', 'Rajani', '23');
+      - insert into info values('Mayank', 'Chouhan', '57');
+      - insert into info values('Bhajan', 'Vajan', '35');
+      - select * from info;
+
+  - create one more bucket
+    - test2-jenkins
+
+- now go to jenkins and click on build with parameter
+  - change the two paramer
+    - database_name: test2
+    - Bucket_name: test2-jenkins
+- click on build, it should work.
