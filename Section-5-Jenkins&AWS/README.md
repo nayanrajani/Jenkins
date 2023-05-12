@@ -91,9 +91,44 @@
 
   - AWS CLI
     - aws configure
-      - AWS_ACCESS_KEY_ID= AKIA5FOTFZWZEZQZFS5K
-      - AWS_SECRET_ACCESS_KEY= XIU3cECXJIEhog471ECisYX8EckPccitwAu1ymkW
+      - AWS_ACCESS_KEY_ID= <your_Access_key>
+      - AWS_SECRET_ACCESS_KEY= <your_Secret_key>
       - region=ap-south-1
+      - Hit Enter
 
   - NOW UPLOAD
     - aws s3 cp /tmp/db.sql s3://jenkins-mysql-backup-training/db.sql
+
+### Automate the backup and upload process with a shell script
+
+- docker exec -ti remote-host bash
+- vi /tmp/aws-s3.sh
+  - check aws-s3.sh
+    #/bin/bash
+
+    DATE=$(date +%H-%M-%S)
+    BACKUP=db-$DATE.sql
+
+    DB_HOST=$1
+    DB_PASSWORD=$2
+    DB_NAME=$3
+
+    mysqldump -u root -h $DB_HOST -p$DB_PASSWORD $DB_NAME > /tmp/$BACKUP
+
+- chmod +x /tmp/aws-s3.sh
+- /tmp/aws-s3.sh db_host 123456 testdb
+
+### Integrate your script with AWS CLI
+
+- create access key and secret key again if you have deleted.
+- docker exec -ti remote-host bash
+- to upload to s3-code check aws-s3.sh
+  - copy and paste the content of that file
+- vi /tmp/aws-s3.sh
+  - save it
+- aws configure
+  - AWS_ACCESS_KEY_ID= <your_Access_key>
+  - AWS_SECRET_ACCESS_KEY= <your_Secret_key>
+  - region=ap-south-1
+  - Hit Enter
+- /tmp/aws-s3.sh db_host 123456 testdb jenkins-mysql-backup-training

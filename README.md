@@ -35,7 +35,7 @@
   - create a user name as jenkins and give password as well.
   - wait for it to complete and then REBOOT.
     - login with jenkins and password
-    - on login check with "ip a" and copy the IP
+    - on login check with "hostname -I" and copy the IP
 
   - Download Putty and change appearence accordingly.
   - now open putty under session add ip in Host section
