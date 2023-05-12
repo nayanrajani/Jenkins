@@ -1,6 +1,6 @@
-## Section-3 Getting Started with Jenkins
+# Section-3 Getting Started with Jenkins
 
-### Intro to Jenkins UI
+## Intro to Jenkins UI
 
 - power up system and jenkins again
   - cd jenkins-data

@@ -1,6 +1,6 @@
-## Section-4 Jenkins & Docker
+# Section-4 Jenkins & Docker
 
-### Docker + Jenkins + SSH - 1
+## Docker + Jenkins + SSH - 1
 
 - let's say you want to work on another host machine where you want to run some different task.
 - so what we can do we can create one more container over here to do ssh and run some commands via ssh.
@@ -136,7 +136,7 @@
 - Integrate your Docker SSH server with Jenkins
   - manage jenkins -> under - manage security -> credentials
   - Stores scoped to Jenkins -> click on systems -> click on global credentials -> add global credentials
-    - choose ssh username and private key-> add remote_user (we created a remote_user in dockerfile, cat centos7/Dockerfile) -> 
+    - choose ssh username and private key-> add remote_user (we created a remote_user in dockerfile, cat centos7/Dockerfile) ->
     - in VM -> cat centos7/remote-key -> copy the Key and paste it over there in a key section -> click create.
   - manage jenkins -> under manage jenkins ->  -> system
   - see ssh sites -> click on ADD
@@ -149,11 +149,11 @@
 - Run your a Jenkins job on your Docker remote host through SSH
   - in which container it will be created??? -> file will be created in remote-host
   - create a new item remote-project
-    - freestyle project 
+    - freestyle project
       - ok
       - go to build -> select Execute shell script on remote host using ssh
         - ssh site: already propogated
-        - command: 
+        - command:
           - NAME=Nayan
             echo "Hello, $NAME. please see the current date and time $(date)" > /tmp/remote-file
       - save
