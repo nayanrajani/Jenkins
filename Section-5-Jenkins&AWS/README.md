@@ -102,7 +102,7 @@
 ### Automate the backup and upload process with a shell script
 
 - docker exec -ti remote-host bash
-- vi /tmp/aws-s3.sh
+- vi /tmp/aws-s3.sh/aws-s3.sh
   - check aws-s3.sh
     #/bin/bash
 
@@ -115,14 +115,14 @@
 
     mysqldump -u root -h $DB_HOST -p$DB_PASSWORD $DB_NAME > /tmp/$BACKUP
 
-- chmod +x /tmp/aws-s3.sh
-- /tmp/aws-s3.sh db_host 123456 testdb
+- chmod +x /tmp/aws-s3.sh/aws-s3.sh
+- /tmp/aws-s3.sh/aws-s3.sh db_host 123456 testdb
 
 ### Integrate your script with AWS CLI
 
 - create access key and secret key again if you have deleted.
 - docker exec -ti remote-host bash
-- vi /tmp/aws-s3.sh
+- vi /tmp/aws-s3.sh/aws-s3.sh
   - to upload to s3-code check aws-s3.sh
   - copy and paste the content of that file
   - save it
@@ -131,7 +131,7 @@
   - AWS_SECRET_ACCESS_KEY= <your_Secret_key>
   - region=ap-south-1
   - Hit Enter
-- /tmp/aws-s3.sh db_host 123456 testdb jenkins-mysql-backup-training
+- /tmp/aws-s3.sh/aws-s3.sh db_host 123456 testdb jenkins-mysql-backup-training
 
 ### Learn how to manage sensitive information in Jenkins (Keys, Passwords)
 
@@ -173,18 +173,18 @@
       - credential: select aws_secret
 
 - For this execution on remote host by jenkins we need to create a new file check aws-s3-v1.sh
-  - vi /tmp/aws-s3-v1.sh
+  - vi /tmp/aws-s3.sh/aws-s3-v1.sh
     - to upload to s3-code check aws-s3-v1.sh
     - copy and paste the content of that file
     - save it
-  - chmod +x /tmp/aws-s3-v1.sh
+  - chmod +x /tmp/aws-s3.sh/aws-s3-v1.sh
 
 - go to Build Section
 - jenkins again
   - add build step
     - execute shell script on remote host using ssh
       - ssh_site: slect remote-host
-      - command: /tmp/aws-s3-v1.sh $MYSQL_HOST $MYSQL_PASSWORD $DATABASE_NAME $AWS_SECRET_KEY $AWS_BUCKET_NAME
+      - command: /tmp/aws-s3.sh/aws-s3-v1.sh $MYSQL_HOST $MYSQL_PASSWORD $DATABASE_NAME $AWS_SECRET_KEY $AWS_BUCKET_NAME
 
 - save
 - build with parameter
@@ -199,7 +199,7 @@
 - and if you recreate at same level
   - docker-compose up -d
   - docker exec -ti remote-host bash
-  - cat /tmp/aws-s3.sh
+  - cat /tmp/aws-s3.sh/aws-s3.sh
   - You will get nothing, files are deleted because of container deletion
   - exit
 
@@ -213,7 +213,7 @@
 
 - docker-compose up -d
 - docker exec -ti remote-host bash
-- /tmp/aws-s3.sh db_host 123456 testdb jenkins-mysql-backup-training
+- /tmp/aws-s3.sh/aws-s3.sh db_host 123456 testdb jenkins-mysql-backup-training
 - run from jenkins as well.
 
 ### Reuse your Job to upload different DB's to different buckets

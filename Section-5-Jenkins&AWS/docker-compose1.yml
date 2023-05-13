@@ -15,8 +15,7 @@ services:
     build:
       context: centos7
     volumes:
-      - "$PWD/aws-s3.sh:/tmp/script.sh"
-      - "$PWD/aws-s3-v1.sh:/tmp/script1.sh"
+      - "$PWD/aws-s3.sh:/tmp/aws-s3.sh"
     networks:
       - net
 
