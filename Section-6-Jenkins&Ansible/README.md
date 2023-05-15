@@ -61,7 +61,7 @@
     - cd $HOME
     - ls ansible/
     - exit
-- ls 
+- ls
 - pwd
 - cp centos7/remote-key jenkins_home/ansible/
 - ls jenkins_home/ansible/
@@ -69,3 +69,104 @@
   - cd $HOME
   - ls ansible/
   - exit
+
+### Create a simple Ansible Inventory
+
+- cd jenkins-data/
+- docker ps -a
+- cd jenkins-ansible
+- cp ../centos7/remote-key .
+- ll
+  - Inventory is the file where you define all of your hosts
+  - vi hosts
+    - check hosts file
+  - cp hosts ../jenkins_home/ansible/
+  - docker exec -ti jenkins bash
+    - cd $HOME
+    - cd ansible/
+    - ls
+      - you will see the hosts file here
+    - cat hosts
+    - ping remote_host
+
+    - Ping from ansible now
+      - ansible -i hosts -m ping test1
+      - if you get error
+    - cd ..
+    - ssh-keygen -f /var/jenkins_home/.ssh/known_hosts
+    - ansible -i hosts -m ping test1
+
+
+### Create your first Ansible Playbook
+
+- playbook is a script, where we can define some commands or task that ansible will do.
+- all the playbooks are written in yaml
+- cd jenkins-data/jenkins-ansible
+- we will create the file outside of container because we don't have vim and any editor inside the container for now.
+- vi play.yml
+  - check play.yml
+- cp play.yml ../jenkins_home/ansible/
+
+- docker exec -ti jenkins bash
+  - cd $HOME
+  - cd ansible
+  - ls
+    - you will be able to see the file here
+  - ansible-playbook -i hosts play.yml
+  - /tmp/ansible-file
+    - you will get nothing
+  - exit
+- docker exec -ti remote-host bash
+  - cat /tmp/ansible-file
+
+### Integrate Ansible and Jenkins (Ansible Plugin)
+
+- login to jenkins
+- managed jenkins
+- plugins -> available plugins -> search for Ansible
+  - install without restart
+  - restart
+- go to installed plugins -> search and chek it.
+
+### Learn how to execute Playbooks from a Jenkins Job
+
+- go to cd jenkins-data
+- docker exec -ti jenkins bash
+  - cd
+  -cd ansible
+  - ls -l
+  - pwd
+    - copy below path
+    - /var/jenkins_home/ansible
+
+- login to jenkins
+- new item
+  - ansible-test
+    - freestyle project
+    - ok
+  - build section
+    - choose invoke ansible playbook
+    - path for playbook: /var/jenkins_home/ansible/play.yml
+    - inventory: file or host list -> /var/jenkins_home/ansible/hosts
+  - save
+- build now
+
+- in VM
+- exit
+- vi jenkins_home/ansible/play.yml
+  - update the file
+  - save
+- docker exec -ti jenkins bash
+  - cd
+  - cat ansible/play.yml
+    - changes are here
+
+- in jenkins
+  - run again
+  - and check console output
+- build successfull
+
+- in VM
+- login to remote-host
+  - docker exec -ti remote-host bash
+  - cat /tmp/ansible-file
