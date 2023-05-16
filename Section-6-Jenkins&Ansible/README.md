@@ -96,7 +96,6 @@
     - ssh-keygen -f /var/jenkins_home/.ssh/known_hosts
     - ansible -i hosts -m ping test1
 
-
 ### Create your first Ansible Playbook
 
 - playbook is a script, where we can define some commands or task that ansible will do.
@@ -338,10 +337,6 @@
 - cd jenkins-ansible
   - vi table.j2
     - check table.j2 inside web folder
-      - change this below line everytime
-        - $sql = "SELECT id, name, lastname, age FROM register {% if PEOPLE_AGE is defined %} where age = {{ PEOPLE_AGE }} {% endif %}";
-      - to
-        - $sql = "SELECT id, name, lastname, age FROM register where age = 25";
     - save
   - now we need to copy and paste this file to our web-> html folder -> index.php, it will replace the file with index.php to table.j2
   - docker cp table.j2 web:/var/www/html/index.php
@@ -349,4 +344,95 @@
 
 ### Integrate your Docker Web Server to the Ansible Inventory
 
-- 
+- our inventory is created under jenkins_home/ansible
+- we need to modify the hosts file here, and adding web here as we added test1
+- in jenkins-data/
+  - vi jenkins_home/ansible/hosts
+    - check hosts file in web folder
+- in jenkins bash
+  - docker exec -ti jenkins bash
+    - ssh web
+      - yes
+      - ctrl + C
+    - cd
+    - cd ansible/
+    - ls
+    - cat hosts
+    - ansible -m ping -i hosts web1
+      - success
+    - ansible -m ping -i hosts test1
+      - success
+    - ansible -m ping -i hosts all
+
+### Create a Playbook in Ansible to update your web table
+
+- in jenkins-data
+- we are creating a ansible playbook
+  - vi jenkins_home/ansible/people.yml
+    - check people.yaml in web folder
+    - save
+
+- in jenkins-ansible
+  - ll
+  - vi table.j2
+    - check table1.j2, this i have created for change reference
+    - save
+  - cp table.j2 ../jenkins_home/ansible
+
+### Test your playbook and see the magic
+
+- in jenkins-ansible
+  - docker exec -ti web bash
+    - cd
+    - cd /var/www/
+    - ll
+    - chown remote_user:remote_user /var/www/html/ -R
+    - ll
+  - docker exec -ti jenkins bash
+    - cd
+    - cd ansible/
+    - ls
+      - you will see the file people.yml and table.j2
+    - Without Age declaration:
+      - ansible-playbook -i hosts people.yml
+      - check web [your-localip]:80, you will see all the data
+
+    - With Age declaration:
+      - ansible-playbook -i hosts people.yml -e "PEOPLE_AGE=22"
+      - check web [your-localip]:80, you will see all the data
+
+### Ready? Let's create a Jenkins Job to build everything with a click
+
+- new item
+  - ansible-users-db
+  - freestyle project
+  - ok
+    - in general
+      - choose this project is parameterised
+        - choose choice parameter
+          - name: AGE
+          - choice: 20
+                    21
+                    22
+                    23
+                    24
+                    25
+    - in build environment
+      - choose color Ansi Console Output
+        - default
+
+    - in build
+      - choose invoke ansible playbook
+        - playbook path: /var/jenkins_home/ansible/people.yml
+        - inventory: file or host: /var/jenkins_home/ansible/hosts
+
+      - Advanced
+        - choose Colorized stdout
+        - choose extra variable
+          - key: PEOPLE_AGE
+          - value: $AGE
+
+    - Save
+    - build with parameter
+    - console output
+    - check web [your-localip]:80, you will see all the data

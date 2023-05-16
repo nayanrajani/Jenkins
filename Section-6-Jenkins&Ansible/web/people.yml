@@ -1,0 +1,8 @@
+- hosts: web1
+  tasks:
+   - name: Transfer template to web server
+     template:
+       src: table.j2
+       dest: /var/www/html/index.php
+
+# Template will transfer the file from local to remote machine
