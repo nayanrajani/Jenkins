@@ -227,3 +227,126 @@
 - build
 
 - console output
+
+### Challenge: Jenkins + Ansible + MySQL + PHP + NGINX + Shell Scripting
+
+### Create the DB that will hold all the users
+
+- go to db container
+  - docker exec -ti db bash
+  - mysql -u root -p
+    - enter password
+    - show databases;
+    - create database people;
+    - use people;
+    - show databases;
+    - create table register (id int(3), name varchar(50), lastname varchar(50), age int(3));
+    - show tables;
+    - desc register;
+
+### Create a Bash Script to feed your DB - I
+
+- cd jenkins-ansible
+  - vi people.txt
+    - check people.txt, it contains a lot of names
+  - vi put.sh
+    - check put1.sh //i have created only one file but here i'm showing two files for better understanding
+  - nl people.txt  // to get all the line with specific number
+    - with specific id
+      - nl people.txt | grep -w 2
+      - nl people.txt | grep -w 4
+    - with column
+      - nl people.txt | grep -w 2 | awk '{print $2}' //it will print cloumn 2
+
+    - Spliting with -> awk -F ','
+      - nl people.txt | grep -w 2 | awk '{print $2}' | awk -F ',' '{print $1}' //it will split cloumn 2 with comma and print name
+      - nl people.txt | grep -w 2 | awk '{print $2}' | awk -F ',' '{print $2}' //it will split cloumn 2 with comma and print lastname
+    - check put1.sh
+  - chmod +x put.sh //executable permission
+  - ./put.sh
+
+### Create a Bash Script to feed your DB - II
+
+- cd jenkins-ansible
+  - shuf -i 20-25 -n 1 // this will print age like 21,22,23,24,25
+  - vi put.sh
+    - check put.sh
+
+### Test your Script inserting the data to the DB
+
+- cd jenkins-ansible
+- ll
+- chmod +x put.sh
+- docker cp put.sh db:/tmp
+- docker cp people.txt db:/tmp
+- docker exec -ti db bash
+  - cd /tmp/
+  - ls -l
+  - ./put.sh
+  - mysql -u root -p
+    - enter password
+    - use people;
+    - show databases;
+    - show tables;
+    - select * from register;
+
+### Start building a Docker Nginx Web Server + PHP - I
+
+- we are going to create a web server thet will hold a HTML to display a table.
+- create a folder web under jenkins-ansible/
+- mkdir jenkins-ansible/web
+- cd jenkins-ansible/web
+  - vi Dockerfile
+    - check web folder, we are using FROM remote-host, it means it will create a image from remote-host and it will run all the commands from remote-host Dockerfile in Centos7
+  - cat Dockerfile
+  - now create folders like bin and conf, and create files under that same.
+    - if you are using jenkins.local name as a localhost then modify below settings
+      - for nginx.conf file, need to modify
+        - open notepad with admnistrator
+          - file -> open -> paste below address in file bar
+            - C:\Windows\System32\drivers\etc
+              - choose "all files" from bottom
+            - select hosts
+              - add below config at the bottom of file
+                - [your-localIP] jenkins.local
+              - save
+  - paste the files and check.
+
+### Start building a Docker Nginx Web Server + PHP - II
+
+- cd ..
+- cd..
+- in jenins-data
+  - vi docker-compose.yml
+    - create a new service, check docker-compose.yml under web folder.
+    - save
+  - docker-compose build
+  - docker-compose up -d
+  - docker ps -a
+    - go to web and search for [your-localip]:80 and you will see an nginx error 403, it means nginx is installed
+
+  - docker exec -ti web bash
+    - cd /var/www/html/
+      - vi index.php
+        - check index.php under web folder
+        - add data
+        - save
+        - now refresh the web page
+
+### Build a table using HTML, CSS and PHP to display users
+
+- cd jenkins-ansible
+  - vi table.j2
+    - check table.j2 inside web folder
+      - change this below line everytime
+        - $sql = "SELECT id, name, lastname, age FROM register {% if PEOPLE_AGE is defined %} where age = {{ PEOPLE_AGE }} {% endif %}";
+      - to
+        - $sql = "SELECT id, name, lastname, age FROM register where age = 25";
+    - save
+  - now we need to copy and paste this file to our web-> html folder -> index.php, it will replace the file with index.php to table.j2
+  - docker cp table.j2 web:/var/www/html/index.php
+  - check output on web [your-localip]:80
+
+### Integrate your Docker Web Server to the Ansible Inventory
+
+- 
