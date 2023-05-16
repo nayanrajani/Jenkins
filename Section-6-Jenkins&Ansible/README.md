@@ -170,3 +170,60 @@
 - login to remote-host
   - docker exec -ti remote-host bash
   - cat /tmp/ansible-file
+
+### Power up! Add parameters to Ansible and Jenkins
+
+- we are going to use a parameter in jenkins and that parameter will get the file and edit the changes.
+
+- in VM
+- vi jenkins_home/ansible/play.yml
+  - please check play1.yml because we are doing changes here.
+
+- in jenkins
+- configure for ansible-test
+  - in general
+    - choose this project is parameterised
+      - add parameter
+        - Name: ANSIBLE_MSG
+        - default value: Hello World
+  - build section
+    - inside playbook configuration
+      - advanced
+        - Extra Variables button
+          - key: MSG
+          - value: $ANSIBLE_MSG
+
+  - save
+
+- build with parameters
+  - modify the text
+- build
+
+- console output
+
+### Missing the colors? Colorize your playbooks' output
+
+- we need to install a plugin for colors
+- in jenkins
+  - managed jenkins -> plugins -> available
+  - AnsiColor -> Install without restart -> wait for install and then restart
+  - check if you want
+
+- go to ansible-test
+  - configure
+  - build-environment
+    - choose Color ANSI Console Output
+      - default setting will be fine
+
+  - build section
+    - inside playbook configuration
+      - advanced
+        - choose Colorized Output
+
+  - save
+
+- build with parameters
+  - modify the text
+- build
+
+- console output
