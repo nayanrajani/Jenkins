@@ -379,7 +379,7 @@
     - save
   - cp table.j2 ../jenkins_home/ansible
 
-### Test your playbook and see the magic
+### Test your playbook and see the magic [Do this section again, if you shut down your system]
 
 - in jenkins-ansible
   - docker exec -ti web bash
