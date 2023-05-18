@@ -1,0 +1,2 @@
+crumb=$(curl -u "trigger:123456" -s 'http://192.168.1.9:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
+curl -u "trigger:123456" -H "$crumb" -X POST http://192.168.1.9:8080/job/ENV/build?delay=0sec
