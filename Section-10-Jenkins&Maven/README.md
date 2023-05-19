@@ -6,7 +6,7 @@
 
 - Maven Integration and chek in installed plugin is git is installer or not
 
-###  Learn how to clone a GIT/GITHUB repository from Jenkins
+### Learn how to clone a GIT/GITHUB repository from Jenkins
 
 - google-> sample maven app
 
@@ -51,3 +51,86 @@
       - check configure output
         - scroll to bottom
           - check building jar: location copy that and check in your jenkins bash
+
+      - check in jenkins bash
+
+### Learn how to test your code
+
+- in maven-job
+  - configure
+    - Build
+      - add build step
+        - invoke top-level maven targets
+          - maven version: choose jenkins-maven
+          - Goals: test
+    - save
+    - build now
+    - configure output
+
+### Deploy your Jar locally
+
+- in maven-job
+  - configure
+    - Build
+      - add build step
+        - Execute Shell
+          - Commands:
+            - echo "***********"
+            - echo "Deploying JAR"
+            - echo "***********"
+            - java -jar (copy Building Jar location from the last console output and paste it over here)
+
+    - save
+    - build now
+    - configure output
+
+- You are doing CI/CD thing properly now
+  - You are retrieving the code from git
+  - you are bulding your JAR
+  - Testing it
+  - Deploying your JAR Locally
+
+### Display the result of your tests using a graph
+
+- Maven is creating a report in xml, inside the workspace.
+  - you can chek in console output, it provides the PATH.
+
+- in maven-job
+  - configure
+    - Post build Action
+      - add post build step
+        - Publish JUnit test result report
+          - Test report xml: target/surefire-reports/*.xml
+
+    - save
+    - build now (5 to 6 times so that graph can appear)
+    - refresh the page
+
+### Archive the last successful artifact
+
+- in maven-job
+  - configure
+    - Post build Action
+      - add post build step
+        - Archive the Artifacts
+          - files to archive: target/*.jar
+            - Advanced
+              - choose option for "Archive only if build successful"
+    - save
+    - build now
+    - configure output
+
+### Send Email notifications about the status of your maven project
+
+- in maven-job
+  - configure
+    - Post build Action
+      - add post build step
+        - Email Notification
+          - recipents: add your email
+          - choose both option
+
+    - try to make an error in shell command, to check email notification
+    - save
+    - build now
+    - configure output
