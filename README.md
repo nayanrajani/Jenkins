@@ -1861,3 +1861,138 @@
       - git push origin main
 
 - now in jenkins check a new execution in job-dsl-master, and check on dashboard new jobs are created.
+
+## Introduction - CI/CD
+
+- https://www.javatpoint.com/devops-pipeline-and-methodology
+- https://www.guru99.com/ci-cd-pipeline.html
+
+- CI/CD is nothing else but a methodology/strategy to deploy code faster to production!
+
+- Thinks that you have an app and you want to deploy it to prod. What should you do? Well you should do a lot manual things, like testing it yourself, compiling, deploying, etc. All of this is normally done manually by a human who can make mistakes! And probably that guy will be awake at 2 am deploying to prod. Trust me, I've lived it.
+
+- So, how does CI/CD help?
+
+- Well, you will define an entire workflow that will build, test and deploy automatically for you! Isn't cool?
+
+- The process is defined by some steps, starting at CI which is Continuous Integration, where you build an test your code; optionally, you could pass to Continuous Delivery, which deploys your built and tested app to a dev/stg/qa env (just to test again) and finally you deploy to production!
+
+- You can read this great article to go deeper: https://www.infoworld.com/article/3271126/ci-cd/what-is-cicd-continuous-integration-and-continuous-delivery-explained.html
+
+### What is Continuous Integration, Continuous Delivery, and Continuous Deployment?
+
+- Continuous integration is a software development method where members of the team can integrate their work at least once a day. In this method, every integration is checked by an automated build to search the error.
+
+- Continuous delivery is a software engineering method in which a team develops software products in a short cycle. It ensures that software can be easily released at any time.
+
+- Continuous deployment is a software engineering process in which product functionalities are delivered using automatic deployment. It helps testers to validate whether the codebase changes are correct, and it is stable or not.
+
+- ![MicrosoftTeams-image (1)](https://github.com/nayanrajani/Personal/assets/57224583/5012de1f-001a-474b-9751-be7eb712cde9)
+
+## Introduction to jenkins pipeline
+
+- https://www.jenkins.io/doc/book/pipeline/
+
+- ![image](https://github.com/nayanrajani/Terraform/assets/57224583/1a86fc3c-a472-4676-a9da-7fe8fd747717)
+
+- there are two types of pipelines
+  - Declarative (super good for beginner)
+  - Scripted (more complicated)
+
+### Install the Jenkins Pipeline Plugin
+
+- Already installed.
+
+### Create your first Pipeline
+
+- check pipeline-templates for this
+
+- in jenkins
+  - create a new item -> pipeline-template -> choose pipeline -> ok
+    - go to Pipeline section
+      - paste the script from first-pipeline from pipeline-template folder
+    - save
+    - build now
+    - check build
+
+### Add multi-steps to your Pipeline
+
+- check multiple-steps file.
+- in jenkins
+  - pipeline-template
+    - configure
+      - pipeline
+        - change the script from multiple-steps file.
+    - save
+    - build now
+    - check build
+
+### Retry
+
+- check retry file.
+- in jenkins
+  - pipeline-template
+    - configure
+      - pipeline
+        - change the script from retry file.
+    - save
+    - build now
+    - check build
+
+### Timeout
+
+- check Timeout file.
+- in jenkins
+  - pipeline-template
+    - configure
+      - pipeline
+        - change the script from Timeout file.
+    - save
+    - build now
+    - check build
+
+### Environment variables
+
+- check env file.
+- in jenkins
+  - pipeline-template
+    - configure
+      - pipeline
+        - change the script from env file.
+    - save
+    - build now
+    - check build
+
+### Credentials
+
+- check creds file.
+- in jenkins
+  - manage-jenkins
+    - Security
+      - credentials
+        - Scoped to jenkins (click on System)
+          - click on Global credentials (unrestricted)
+            - add credentials
+              - choose secret text
+                - Secret: [anything you can add]
+                - ID: SECRET_TEXT
+            - create
+  - pipeline-template
+    - configure
+      - pipeline
+        - change the script from creds file.
+    - save
+    - build now
+    - check build
+
+### Post actions
+
+- check post-actions file.
+- in jenkins
+  - pipeline-template
+    - configure
+      - pipeline
+        - change the script from post-actions file.
+    - save
+    - build now
+    - check build
