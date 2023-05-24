@@ -1,0 +1,14 @@
+
+job('job_dsl_child1') {
+
+    description('This is my awesome Job')
+
+  
+    parameters {
+        stringParam('Planet', defaultValue = 'world', description = 'This is my first child Job')
+	booleanParam('FLAG', true)
+        choiceParam('OPTION', ['option 1 (default)', 'option 2', 'option 3'])
+    }
+
+}
+

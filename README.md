@@ -36,7 +36,7 @@
 
 ## Section-2 Introduction & Installation
 
-- https://www.javatpoint.com/jenkins
+- <https://www.javatpoint.com/jenkins>
 
 ### [Jenkins](https://www.jenkins.io/)
 
@@ -727,7 +727,7 @@
 
 ## Section-6-Jenkins&Ansible
 
-- https://www.javatpoint.com/ansible
+- <https://www.javatpoint.com/ansible>
 
 ### Ansible
 
@@ -1228,7 +1228,7 @@
     - save
   - login to nayan user on incognito mode.
 
-### Learn how to restrict Jobs to users using Project Roles.
+### Learn how to restrict Jobs to users using Project Roles
 
 - we need to create a project role it is based on patterns to assign users in it.
 - go to "Manage and Assign Roles"
@@ -1285,8 +1285,8 @@
     - under build trigger
       - select Build Periodically
         - a cron job here, check the given [link](https://crontab.guru/)
-        - H 17 * * * (5'o clock)
-        - H * * * * (every single Hour)
+        - H 17 ** * (5'o clock)
+        - H **** (every single Hour)
     - check in Build History, job will run every minute
     - revert the changes
 
@@ -1309,7 +1309,7 @@
 - in vm
 - cd jenkins-data
   - curl 192.168.1.9:8080
-  - crumb=$(curl -u "trigger:123456" -s 'http://192.168.1.9:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
+  - crumb=$(curl -u "trigger:123456" -s '<http://192.168.1.9:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)>')
   - echo $crumb
   - create a crumbwithoutparameter.sh file
     - check in crumbwithoutparameter.sh
@@ -1342,7 +1342,7 @@
 
 - In jenkins
   - manage jenkins
-    - go to system 
+    - go to system
       - Jenkins Location
         - System Admin e-mail address
           - add your email address
@@ -1396,7 +1396,7 @@
 
 ## Introduction: Jenkins & Maven
 
-- https://www.javatpoint.com/maven-tutorial
+- <https://www.javatpoint.com/maven-tutorial>
 
 ### Install Plugin
 
@@ -1406,7 +1406,7 @@
 
 - google-> sample maven app
 
-- copy the URL (https://github.com/jenkins-docs/simple-java-maven-app.git)
+- copy the URL (<https://github.com/jenkins-docs/simple-java-maven-app.git>)
 
 - in jenkins
   - new item -> Maven joon -> fresstyle -> ok
@@ -1530,3 +1530,334 @@
     - save
     - build now
     - configure output
+
+## Jenkins&Git
+
+### Create a Git Server using Docker
+
+- check git server requirement on google
+
+- in virtualbox close + shutdown, and got to settings, system change ram to 4 gb recommended in 8 gb
+- processor to 2
+- ok
+
+- start again virtual machine
+- in VIM
+  - cd jenkins-data
+    - cat /proc/cpuinfo | grep cores
+    - free -h
+  - we will create a gitlab server with docker file
+    - check docker-compose.yml
+    - docker-compose up -d
+    - docker ps -a
+    - docker logs -f git-server
+      - it is still executing wait till it completes
+      - when you see chef client finished, it means it is completed
+      - check on your browser with [yourip]:8090
+        - we are not using DNS, if you are like we did in jenkins.local, you can do it here as well
+        - Username: root
+        - Password: Password stored to /etc/gitlab/initial_root_password. This file will be cleaned up in first reconfigure run after 24 hours
+        - docker exec -ti git-server bash
+        - cd
+        - cat /etc/gitlab/initial_root_password
+          - WARNING: This value is valid only in the following conditions
+            - If provided manually (either via `GITLAB_ROOT_PASSWORD` environment variable or via `gitlab_rails['initial_root_password']` setting in `gitlab.rb`, it was provided before database was seeded for the first time (usually, the first reconfigure run).
+            - Password hasn't been changed manually, either via UI or via command line.
+              - If the password shown here doesn't work, you must reset the admin password following <https://docs.gitlab.com/ee/security/reset_user_password.html#reset-your-root-password>.
+
+              - Password: [secret password]
+
+            - NOTE: This file will be automatically deleted in the first reconfigure run after 24 hours.
+        - Copy the password and login to the web gitlab server
+        - change the password once you loggedin with that password
+
+### Create your first Git Repository
+
+- In Gitlab
+- create a group
+  - group name: jenkins
+  - visibility level: Private
+  - create new project
+    - maven
+    - private
+    - create
+
+### Create a Git User to interact with your Repository
+
+- go to settings
+- create a new user, with access level of regular then create
+  - now edit that user to add password
+- now login with this user and change the password
+
+- now go to projects -> maven project -> manage access -> invite mmebers -> type username, role will be maintainer, invite
+
+### Upload the code for the Java App in your Repo
+
+- <https://github.com/jenkins-docs/simple-java-maven-app>
+- go to your vm
+  - cd jenkins-data
+    - sudo yum -y install git
+      - password
+    - git clone <https://github.com/jenkins-docs/simple-java-maven-app>
+    - ls -l
+    - now we need to upload this code to gitlab server
+      - in gitlab
+        - under maven project
+          - repository
+            - files
+              - copy the command from add your files for cloning
+                - git clone <http://gitlab.nayan.com/jenkins/maven.git>
+                  - it will give you an error, because we haven'r set the gitlab.nayan.com.
+                    - we will use
+                      - git clone <http://192.168.1.8:8080/jenkins/maven.git>
+                        - enter name
+                        - enter password
+                      - cd maven
+                        - cp -r ../simple-java-maven-app/* .
+                        - git status
+                        - git add .
+                        - git commit -m "adding maven files"
+                        - git push origin main
+                    - refresh your browser page of maven project
+
+### Integrate your Git server to your maven Job
+
+- Now we will integrate this to our jenkins maven job, so that we can retrieve the code directly from our gitlab rather then github.
+
+- login to jenkins
+  - first need to create user because our current repo has credentials to pull, push code
+    - manage jenkins
+      - security
+      - credentials
+        - system (Stores scoped to Jenkins)
+          - global credentials
+            - add credentials
+              - username with password
+                - username: [yourusername]
+                - username: [yourpassword]
+                - ID: git_maintainer
+              - create
+  - go to maven-job
+    - configure
+      - under SCM (because we are now doing internal communication so we need to use port 80)
+        - Repo URL: <http://git:80/jenkins/maven.git>
+        - credentials: choose git_maintainer
+      - save
+      - build now
+      - console output
+
+### Learn about Git Hooks & Trigger your Jenkins job using a Git Hook
+
+- Git hooks is like a trigger, whenever someone pushes to any branch, and then a trigger is going to happen where you can define what you want to do.
+- in VM
+  - cd jenkins-data
+    - docker exec -ti git-server bash
+      - we need to search for a hashed repo, for that
+        - To look up a project’s hash path in the Admin Area:
+
+        - On the top bar, select Main menu > Admin.
+        - On the left sidebar, select Overview > Projects and select the project.
+        - The Gitaly relative path is displayed there and looks similar to:
+
+          - "@hashed/b1/7e/b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9.git"
+
+      - now in container
+        - cd /var/opt/gitlab/git-data/repositories/[@hashed-path]
+        - ls -l
+        - mkdir custom_hooks
+        - cd custom_hooks
+          - vi post-receive
+            - check post-receive
+            - save
+          - chmod +x post-receive
+          - cd ..
+        - ll
+        - chown git:git custom_hooks/ -R  (changing permission)
+        - ll
+        - exit
+
+  - cd maven/
+    - ll
+    - grep -R Hello
+      - copy the hello world java app path
+      - copy the test code path
+    - vi src/main/java/com/mycompany/app/App.java
+      - change anything in Hello world section
+    - vi src/test/java/com/mycompany/app/AppTest.java
+      - change something in assert line
+    - git status
+    - git add .
+    - git commit -m "adding maven updated files"
+    - git push origin main
+
+## Introduction: Jenkins DSL
+
+- <https://www.jenkins.io/doc/pipeline/steps/job-dsl/>
+- <https://www.digitalocean.com/community/tutorials/how-to-automate-jenkins-job-configuration-using-job-dsl>
+- <https://github.com/jenkinsci/job-dsl-plugin/wiki/Tutorial---Using-the-Jenkins-Job-DSL>
+- <https://jenkinsci.github.io/job-dsl-plugin/>
+
+### Install Plugin
+
+- Job DSL in jenkins
+
+### Create a Parent Seed
+
+- in jenkins
+  - Create a new item -> job-dsl-master -> fressstyle -> ok
+    - in Configure
+      - Build
+        - Add a build step -> choose Process Job DSLs
+          - choose Use the provided DSL script
+            - check under dsl -> job.j2
+            - copy the code and paste in the DSL Script section
+    - save
+      - managejenkins
+        - Security -> in process script approval, approve manually
+    - build now
+    - check configure
+
+- now check the child job is created on dashboard but do not run this
+
+### Description
+
+- you can directly add a description or you can write a code for that too.
+  - check description.j2
+  - paste this code there on jenkins and re run
+  - now check the child job is created on dashboard but do not run this
+
+### Parameters
+
+- check parameters.j2
+- copy the code and paste it in job-dsl-master and build the master one
+- now check the child job is created on dashboard but do not run this
+
+### SCM [Source Code Management]
+
+- check scm.j2
+- paste this code there on jenkins job "job-dsl-master" and re run and check child1 job
+
+### Triggers
+
+- check triggers.j2
+- paste this code there on jenkins job "job-dsl-master" and re run and check child1 job
+
+### Steps
+
+- check steps.j2
+- paste this code there on jenkins job "job-dsl-master" and re run and check child1 job
+
+### Mailer
+
+- check mailer.j2
+- paste this code there on jenkins job "job-dsl-master" and re run and check child1 job
+
+### Recreate the Ansible Job using DSL
+
+- check ansible.j2
+- paste this code after the older job(if you want to keep the older job) and then on jenkins job "job-dsl-master" and re run and check dsl-ansible job
+
+- in VM
+- cd jenkins-ansible
+  - docker exec -ti web bash
+    - cd
+    - cd /var/www/
+    - ll
+    - chown remote_user:remote_user /var/www/html/ -R
+    - ll
+
+- in jenkins
+  - Build with parameters the newly created dsl-ansible job
+  - check on web with [your-ip]:80
+
+### Recreate the Maven Job using DSL
+
+- check maven.j2
+- paste this code after the older job(if you want to keep the older job) then on jenkins job "job-dsl-master" and re run and check dsl-maven job
+
+### Version your DSL code using Git
+
+- on git web server
+- create a new project under jenkins group
+  - name: dsl-jenkins-jobs
+  - create
+  - Project Information
+    - members
+      - invite the member maintain
+
+- in VM
+- cd jenkins-data
+  - ll
+  - git clone <http://192.168.1.6:8090/jenkins/dsl-jenkins-jobs.git>
+    - username and password of maintain
+  - cd dsl-jenkins-jobs
+    - vi jobs
+      - go to jenkins dashboard and copy the DSL Script from "job-dsl-master"
+      - paste the code here
+    - save
+    - git status
+    - git add .
+    - git commit -m "add dsl script to re-run from git server"
+    - git push origin main
+
+### Magic? Create Jobs only pushing the DSL code to your Git server
+
+- cd dsl-jenkins-jobs
+  - docker exec -ti git-server bash
+    - cd
+    - on jenkins
+      - we need to search for a hashed repo, for that
+        - To look up a project’s hash path in the Admin Area:
+
+        - On the top bar, select Main menu > Admin.
+        - On the left sidebar, select Overview > Projects and select the project.
+        - The Gitaly relative path is displayed there and looks similar to:
+
+          - "@hashed/4e/07/4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce.git"
+
+      - now in container
+        - cd /var/opt/gitlab/git-data/repositories/[@hashed-path]
+        - ls -l
+        - mkdir custom_hooks
+        - cd custom_hooks
+          - vi post-receive
+            - check post-receive file
+            - save
+          - chmod +x post-receive
+          - cd ..
+        - ll
+        - chown git:git custom_hooks/ -R  (changing permission)
+        - ll
+        - exit
+
+- in Jenkins
+  - in job-dsl-master
+    - configure
+      - SCM
+        - choose GIT
+          - Repo URL: <http://git:80/jenkins/dsl-jenkins-jobs.git>
+          - Credential: Choose maintain credentials
+      - Build
+        - Process Job DSL
+          - choose Look on Filesystem
+            - jobs
+    - Save
+  
+  - Manage Jenkins
+    - Security -> security
+      - Git plugin notifyCommit access tokens
+        - uncheck Git plugin notifyCommit access tokens
+    - Save
+  
+  - cd jenkins-data
+    - cd dsl-jenkins-jobs
+      - vi jobs
+        - change anything that you want to reflect the change live
+      - save
+      - git status
+      - git diff jobs
+      - git add .
+      - git commit -m "Creating a new job via GIT SERVER"
+      - git push origin main
+
+- now in jenkins check a new execution in job-dsl-master, and check on dashboard new jobs are created.
