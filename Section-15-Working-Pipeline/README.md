@@ -447,6 +447,176 @@
     - username
     - password
 
-### Create the Registry Password in Jenkins
+### Create the Registry/DockerHub Password in Jenkins
 
-- 
+- Add the password in Jenkins/credentials
+  - Kind
+    - Secret: password of dockerhub
+    - ID: PASS
+    - DockerHub Password
+
+- Modify the Jenkinsfile
+  - cd jenkins-data/pipeline
+    - vi Jenkinsfile
+      - check Jenkinsfile2-Password
+      - save
+  - git status
+  - git add Jenkinsfile
+  - git commit -m "changes in file"
+  - git push origin main
+    - username
+    - password
+
+### Add the private ssh key to the Jenkins container
+
+- cd pipeline
+  - docker cp ~/prod jenkins:/opt/prod
+  - docker exec -ti jenkins bash
+    - cd opt/
+      - ls
+      - ssh -i prod prod-user@3.111.245.201
+        - yes
+
+### Add post actions to Jenkinsfile
+
+- check Jenkinsfile, do this for build and test.
+  - git status
+  - git add Jenkinsfile
+  - git commit -m "changes in file"
+  - git push origin main
+    - username
+    - password
+
+### Execute your Pipeline manually
+
+- go to jenkins console
+  - inside the pipeline-docker-maven
+    - build-now
+    - check console output
+
+- login to your new VM and do
+  - docker ps -la
+    - exited
+    - docker logs maven-app
+
+### Details:
+- Let's take a quick recopying here.
+
+- Let's go to the logs.
+
+- And remember, we're cloning the repository with the new changes.
+
+- We're building a jar with that new code thing where Vildan not using that specific jar and then we're
+
+- testing the code using Docker container.
+
+- And then we are actually pushing the image to the dock registry that we created.
+
+- And finally, we are deploying that new image that past all of the tests and that is ready to be deployed
+
+- using there's a script.
+
+- And whenever we deployed, we're transferring the file with environment variables we're reading that
+
+- find that remote machine, downloading the image, the correct image, getting authenticated, using
+
+- Duckula login and finally deploying the application, as you can see it, recreating the Mavin upset.
+
+- This is super great.
+
+### Create a Git Hook to automatically trigger your Pipeline
+
+- As you saw in the previous Leisen, our pipeline is working good, by the way.
+
+- We need to trigger it manually.
+
+- So now we are going to create a good cook in the repository so that whenever the developers push code
+
+- to our target repository, git is going to trigger our job.
+
+- And then the entire continuous integration process is going to start building the jarra with the new
+
+- code, testing it, pushing it and deploying it to the final environment.
+
+- So to do this, we're going to enter inside of the repository.
+
+- cd localhost
+  - docker exec -ti git-server bash
+    - cd /var/opt/gitlab/git-data/repositories/@hashed/ef/2d/ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d.git
+      - mkdir custom_hooks
+      - cd custom_hooks
+        - vi post-receive
+          - check post-receive
+          - save
+        - chmod +x post-receive
+        - cd ..
+      - chown git:git custom_hooks/ -R
+      - ll
+      - exit
+
+### Start the CI/CD process by committing new code to Git!
+
+- login to your new VM and do
+  - docker logs maven-app
+    - Output is "Hello World!"
+
+- cd jenkins-data/pipeline/java-app
+  - grep -R Hello
+    - README.md:"Hello world!" and is accompanied by a couple of unit tests to check that the
+    - src/main/java/com/mycompany/app/App.java: * Hello world!
+    - src/main/java/com/mycompany/app/App.java:    private static final String MESSAGE = "Hello World!";
+    - src/test/java/com/mycompany/app/AppTest.java:        assertEquals("Hello World!", app.getMessage());
+    - Binary file target/classes/com/mycompany/app/App.class matches
+    - Binary file target/test-classes/com/mycompany/app/AppTest.class matches
+  - vi src/main/java/com/mycompany/app/App.java
+    - change to "Hello From New Pipeline!"
+    - save
+  - vi src/test/java/com/mycompany/app/AppTest.java
+    - change to "Hello From New Pipeline!"
+    - save
+  - git status
+  - git add src/
+  - git commit -m "changes in file"
+  - git push origin main
+    - username
+    - password
+  - check on jenkins pipeline-docker-maven job
+    - job is executed successfully
+
+- So let's go to this execution, let's go to console output and we're going to take a look at the logs.
+
+- Remember, the first thing that we always do is that we download the new code.
+
+- In this case, we're downloading the last version of this code, which is our test trigger code that
+
+- we actually pushed.
+
+- After we download the new code, we start building the jar with that new code.
+
+- Remember, the code had a different message.
+
+- It says hello from Pipeline and this year is going to be built using that code after divil is successful.
+
+- Then we're going to start building the image, copying the new jar to the image.
+
+- Finally, we start doing tests to the code.
+
+- Everything went good, so we keep scrolling.
+
+- And if everything goes Ghias, then we just push this to our docker hop repository and finally we deploy
+
+- this new image to our remote machine.
+
+- And the final thing that we should say is that our container in here, what is recreating Mavin nap?
+
+- It should now say hello from Pipeline because we actually created all of these processes to easily update
+
+- our remote application.
+
+- You remember that previously our containers said hello world.
+
+- Well, through all of these processes, this container should be evaded and now it should say something
+
+- login to your new VM and do
+  - docker logs maven-app
+    - Output is "Hello From New Pipeline!"
